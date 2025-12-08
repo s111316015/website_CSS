@@ -1,0 +1,227 @@
+/* 莫蘭迪淺色系變數 */
+:root {
+    --morandi-light-bg: #f7f7f5; /* 極淺米白/灰白 */
+    --morandi-primary: #a8b9bf; /* 莫蘭迪灰藍 (Bootstrap Primary Color) */
+    --morandi-secondary: #c9c3b8; /* 莫蘭迪淺灰褐 */
+    --text-dark: #333;
+    --text-light: #666;
+    --accent-color: #7b94a7; /* 略深的灰藍作為強調 (Bootstrap Accent Color) */
+    --border-color: #e0e0e0;
+    
+    /* 字體與排版變數 */
+    --font-size-base: 1.05rem; /* 基礎字體稍大一點，更易讀 */
+}
+
+/* 覆寫 Bootstrap 變數，以便使用自定義顏色 */
+.btn-custom-color,
+.btn-custom-color:hover,
+.btn-primary {
+    --bs-btn-bg: var(--morandi-primary);
+    --bs-btn-border-color: var(--morandi-primary);
+    --bs-btn-hover-bg: var(--accent-color);
+    --bs-btn-hover-border-color: var(--accent-color);
+    --bs-btn-active-bg: var(--accent-color);
+    --bs-btn-active-border-color: var(--accent-color);
+}
+
+.text-accent {
+    color: var(--accent-color) !important;
+}
+
+/* -------------------- 字體與行高調整 -------------------- */
+body {
+    font-family: 'Noto Sans TC', 'Microsoft YaHei', sans-serif; 
+    margin: 0;
+    padding: 0;
+    background-color: var(--morandi-light-bg);
+    color: var(--text-dark);
+    line-height: 1.7; /* 增加行高，提升內文閱讀舒適度 */
+    font-size: var(--font-size-base);
+    font-weight: 300; /* 內文使用較輕的字重 */
+}
+
+h1, h2, h3 {
+    color: var(--accent-color);
+    margin-top: 0;
+    border-left: 4px solid var(--morandi-primary);
+    padding-left: 10px;
+    display: inline-block;
+    font-weight: 700; /* 標題使用粗體字重 */
+    margin-bottom: 20px; 
+}
+
+h1 { font-size: 2.2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.4rem; }
+
+h4 { 
+    font-weight: 500; /* 次級標題使用中等字重 */
+    color: var(--text-dark);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+/* ---------------------------------------------------- */
+
+/* -------------------- 間距與佈局調整 -------------------- */
+
+/* 標頭樣式 */
+.header-content {
+    padding: 15px 20px; /* 增加導航欄的高度 */
+}
+
+.nav-list {
+    gap: 30px; /* 增加導航列項目之間的間距 */
+}
+
+.nav-list a {
+    text-decoration: none;
+    color: var(--text-light);
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-list a:hover {
+    color: var(--accent-color);
+}
+
+/* 主要內容區域 */
+main {
+    max-width: 900px;
+    margin: 60px auto; /* 增加頂部和底部外邊距 */
+    padding: 0 20px;
+}
+
+.content-section {
+    background-color: white;
+    padding: 50px; /* 增加區塊內填充 */
+    margin-bottom: 40px; /* 增加區塊之間的外邊距 */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* 關於我卡片樣式 */
+.profile-photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%; 
+    object-fit: cover;
+    border: none;
+}
+
+.profile-card {
+    display: flex;
+    gap: 40px; /* 增加照片和文字的間距 */
+    align-items: flex-start;
+    margin-top: 40px;
+}
+
+.degree {
+    color: var(--accent-color);
+    margin-bottom: 10px; /* 略微減少學歷項目間距 */
+}
+
+/* 作品/經歷區塊樣式 */
+.work-item, .experience-item {
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 20px; /* 增加內容底部填充 */
+    margin-bottom: 30px; /* 增加內容底部外邊距 */
+}
+
+.work-item:last-child, .experience-item:last-child {
+    border-bottom: none;
+}
+
+/* 清單間距調整 */
+ul {
+    margin-top: 10px;
+    margin-bottom: 0;
+    padding-left: 20px; 
+}
+
+.experience-item ul li {
+    padding-bottom: 5px; 
+}
+
+/* 經歷與技能分隔線 */
+.border-dashed {
+    border-bottom-style: dashed !important;
+}
+
+/* 聯繫資訊 */
+.contact-info a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+/* 頁腳 */
+footer {
+    text-align: center;
+    padding: 30px 20px;
+    margin-top: 80px;
+    color: var(--text-light);
+    font-size: 0.9em;
+    border-top: 1px solid var(--border-color);
+}
+
+/* 圖片作品畫廊樣式 */
+.custom-img-height {
+    height: 180px;
+    object-fit: cover;
+    width: 100%;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.custom-img-height:hover {
+    transform: scale(1.05);
+}
+
+.figure {
+    margin: 0;
+    padding: 0;
+    background-color: var(--morandi-light-bg);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.figure-caption {
+    padding: 10px;
+    font-size: 0.9em;
+    color: var(--text-light);
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+    .content-section {
+        padding: 30px; /* 小螢幕時減少區塊填充 */
+        margin-bottom: 30px;
+    }
+    main {
+        margin: 30px auto;
+    }
+    .profile-card {
+        flex-direction: column; /* 小螢幕上堆疊 */
+        align-items: center;
+        gap: 20px;
+    }
+}
+
+/* -------------------- 導航列字體顏色調整 -------------------- */
+
+.navbar-brand {
+    /* 覆蓋 Bootstrap 的預設顏色，使用自定義的強調色 */
+    color: var(--accent-color) !important; 
+    
+    /* 可選：讓網站名稱更粗體 */
+    font-weight: 700 !important; 
+    
+    /* 可選：增加字體大小 */
+    font-size: 1.5rem !important; 
+}
+
+/* -------------------------------------------------------- */
