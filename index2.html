@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王怡婷的個人網站</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        /* 莫蘭迪淺色系變數 */
+        :root {
+            --morandi-light-bg: #f7f7f5; /* 極淺米白/灰白 */
+            --morandi-primary: #a8b9bf; /* 莫蘭迪灰藍 (Bootstrap Primary Color) */
+            --morandi-secondary: #c9c3b8; /* 莫蘭迪淺灰褐 */
+            --text-dark: #333;
+            --text-light: #666;
+            --accent-color: #7b94a7; /* 略深的灰藍作為強調 (Bootstrap Accent Color) */
+            --border-color: #e0e0e0;
+            
+            /* 字體與排版變數 */
+            --font-size-base: 1.05rem; /* 基礎字體稍大一點，更易讀 */
+        }
+
+        /* 覆寫 Bootstrap 變數，以便使用自定義顏色 */
+        .btn-custom-color,
+        .btn-custom-color:hover,
+        .btn-primary {
+            --bs-btn-bg: var(--morandi-primary);
+            --bs-btn-border-color: var(--morandi-primary);
+            --bs-btn-hover-bg: var(--accent-color);
+            --bs-btn-hover-border-color: var(--accent-color);
+            --bs-btn-active-bg: var(--accent-color);
+            --bs-btn-active-border-color: var(--accent-color);
+        }
+
+        .text-accent {
+            color: var(--accent-color) !important;
+        }
+
+        /* -------------------- 字體與行高調整 -------------------- */
+        body {
+            font-family: 'Noto Sans TC', 'Microsoft YaHei', sans-serif; 
+            margin: 0;
+            padding: 0;
+            background-color: var(--morandi-light-bg);
+            color: var(--text-dark);
+            line-height: 1.7; /* 增加行高，提升內文閱讀舒適度 */
+            font-size: var(--font-size-base);
+            font-weight: 300; /* 內文使用較輕的字重 */
+        }
+
+        h1, h2, h3 {
+            color: var(--accent-color);
+            margin-top: 0;
+            border-left: 4px solid var(--morandi-primary);
+            padding-left: 10px;
+            display: inline-block;
+            font-weight: 700; /* 標題使用粗體字重 */
+            margin-bottom: 20px; 
+        }
+
+        h1 { font-size: 2.2rem; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.4rem; }
+
+        h4 { 
+            font-weight: 500; /* 次級標題使用中等字重 */
+            color: var(--text-dark);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        /* ---------------------------------------------------- */
+
+        /* -------------------- 間距與佈局調整 -------------------- */
+
+        /* 標頭樣式 */
+        .header-content {
+            padding: 15px 20px; /* 增加導航欄的高度 */
+        }
+
+        .nav-list-custom { /* 使用 HTML 中的自定義 class */
+            gap: 30px; /* 增加導航列項目之間的間距 */
+        }
+
+        .nav-list-custom a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-list-custom a:hover {
+            color: var(--accent-color);
+        }
+
+        /* 主要內容區域 */
+        main {
+            max-width: 900px;
+            margin: 60px auto; /* 增加頂部和底部外邊距 */
+            padding: 0 20px;
+        }
+
+        .content-section {
+            background-color: white;
+            padding: 50px; /* 增加區塊內填充 */
+            margin-bottom: 40px; /* 增加區塊之間的外邊距 */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        /* 關於我卡片樣式 */
+        .profile-photo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%; 
+            object-fit: cover;
+            border: none;
+        }
+
+        .profile-card {
+            display: flex;
+            gap: 40px; /* 增加照片和文字的間距 */
+            align-items: flex-start;
+            margin-top: 40px;
+        }
+
+        .degree {
+            color: var(--accent-color);
+            margin-bottom: 10px; /* 略微減少學歷項目間距 */
+        }
+
+        /* 作品/經歷區塊樣式 */
+        .work-item, .experience-item {
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 20px; /* 增加內容底部填充 */
+            margin-bottom: 30px; /* 增加內容底部外邊距 */
+        }
+
+        .work-item:last-child, .experience-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 清單間距調整 */
+        ul {
+            margin-top: 10px;
+            margin-bottom: 0;
+            padding-left: 20px; 
+        }
+
+        .experience-item ul li {
+            padding-bottom: 5px; 
+        }
+
+        /* 經歷與技能分隔線 */
+        .border-dashed {
+            border-bottom-style: dashed !important;
+        }
+
+        /* 聯繫資訊 */
+        .contact-info a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        /* 頁腳 */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 80px;
+            color: var(--text-light);
+            font-size: 0.9em;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* 圖片作品畫廊樣式 - 調整圖片大小和效果 */
+        .custom-img-height {
+            /* 移除固定高度，讓圖片基於寬度自由縮放 */
+            min-height: 180px; /* 設置一個最小高度，避免圖片過小 */
+            max-height: 300px; /* 設置一個最大高度，避免圖片過大 */
+            object-fit: cover;
+            width: 100%;
+            display: block;
+            transition: transform 0.3s ease;
+            aspect-ratio: 16/9; /* 設定圖片的長寬比為 16:9，確保一致性 */
+        }
+
+        .custom-img-height:hover {
+            transform: scale(1.03); /* 輕微縮放即可 */
+        }
+
+        .figure {
+            margin: 0;
+            padding: 0;
+            background-color: var(--morandi-light-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color); /* 添加邊框以區分 */
+        }
+
+        .figure-caption {
+            padding: 10px;
+            font-size: 0.9em;
+            color: var(--text-light);
+        }
+
+        /* 響應式調整 */
+        @media (max-width: 768px) {
+            .content-section {
+                padding: 30px; /* 小螢幕時減少區塊填充 */
+                margin-bottom: 30px;
+            }
+            main {
+                margin: 30px auto;
+            }
+            .profile-info {
+                text-align: center;
+            }
+            /* .profile-card 樣式在 HTML 中已透過 Bootstrap 的 row/col 調整 */
+        }
+
+        /* -------------------- 導航列字體顏色調整 -------------------- */
+
+        .navbar-brand {
+            /* 覆蓋 Bootstrap 的預設顏色，使用自定義的強調色 */
+            color: var(--accent-color) !important; 
+            
+            /* 可選：讓網站名稱更粗體 */
+            font-weight: 700 !important; 
+            
+            /* 可選：增加字體大小 */
+            font-size: 1.5rem !important; 
+        }
+
+        /* -------------------------------------------------------- */
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand bg-white shadow-sm sticky-top" data-bs-theme="light">
+            <div class="container-fluid px-4 px-lg-5">
+                <a class="navbar-brand text-dark fw-bold" href="#">王怡婷的個人網站</a>
+
+                <div class="navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto nav-list-custom">
+                        <li class="nav-item"><a class="nav-link" href="#section1">關於我</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#section2">經歷</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#section3">技能</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#section6">圖片</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#section4">音樂</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#section5">視訊</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#section7">聯繫</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container my-5">
+        <div class="row">
+            <div class="col-12 col-lg-10 offset-lg-1">
+
+                <article id="section1" class="p-4 p-md-5 mb-4 bg-white rounded-3 shadow-sm about-me-section">
+                    <h2 class="section-title">🌱 關於我</h2>
+                    <div class="row align-items-center mt-4">
+                        <div class="col-md-4 text-center mb-4 mb-md-0">
+                            <img src="assets/images/吉川耶.jpg" alt="王怡婷照片"
+                                class="img-fluid rounded-circle profile-photo shadow">
+                        </div>
+                        <div class="col-md-8 profile-info">
+                            <h3>王怡婷</h3>
+                            <p class="text-secondary degree">
+                                <em><strong><a href="https://www.ntue.edu.tw/" target="_blank"
+                                                class="text-decoration-none text-accent"> 國立臺北教育大學</a></strong>
+                                    資訊科學系</em>
+                            </p>
+                            <p class="text-secondary degree">
+                                <em><strong><a href="https://www.bdsh.ntpc.edu.tw/" target="_blank"
+                                                class="text-decoration-none text-accent"> 新北市立北大高級中學</a></strong>
+                                    數理實驗班</em>
+                            </p>
+                            <p class="text-secondary degree">
+                                <em><strong><a href="https://www.dfsh.ntpc.edu.tw/" target="_blank"
+                                                class="text-decoration-none text-accent"> 新北市立丹鳳高級中學</a></strong>
+                                    國中部</em>
+                            </p>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-secondary fst-italic">
+                        嗨，我是王怡婷。如果把我的腦袋當作一間電影製片廠，那資訊科學就是我的首席工程師，負責確保互動機制的完美運行；而多媒體則是我的藝術總監，負責視覺衝擊和情感渲染。我，就是那個站在中央、手拿劇本的跨界導演，目標是導出一齣理性與感性兼具的好故事！
+                    </p>
+                </article>
+
+                <article id="section2" class="content-section">
+                    <h2>💼 工作經歷與專案</h2>
+
+                    <div class="experience-item">
+                        <h4>校園活動策劃組 | 國北教大藝術季 (2023/03 - 2023/06)</h4>
+                        <ul>
+                            <li>主視覺設計：負責本屆藝術季所有線上線下宣傳素材的視覺統籌與設計。</li>
+                            <li>互動裝置協作：與團隊共同開發一個基於 Arduino 的聲音互動裝置，吸引超過 500 人次體驗。</li>
+                            <li>跨域溝通：協調藝術、設計與資訊團隊，確保專案順利執行與成果展現。</li>
+                        </ul>
+                    </div>
+
+                    <div class="experience-item">
+                        <h4>個人專案 | 《記憶迴廊》互動敘事網站 (2024/02 - 2024/05)</h4>
+                        <ul>
+                            <li>網站開發與內容創作：融合 HTML/CSS/JavaScript 實現具備時間軸與音效變化的互動式網頁。</li>
+                            <li>使用者研究：透過訪談與問卷，優化使用者旅程與介面設計，提升情感共鳴。</li>
+                            <li>成果：專案於系內發表，獲得師生廣泛好評，被譽為結合技術與人文的典範。</li>
+                        </ul>
+                    </div>
+
+                </article>
+
+                <article id="section3" class="content-section">
+                    <h2>🛠️ 工作技能</h2>
+
+                    <div class="skills-category">
+                        <h4>設計與使用者體驗 (UX/UI)</h4>
+                        <p>Figma (原型設計、使用者流程), Adobe XD (線框圖), Storyboarding, Usability Testing</p>
+                    </div>
+
+                    <div class="skills-category">
+                        <h4>媒體內容創作</h4>
+                        <p>Adobe Premiere Pro (影片剪輯), Adobe Photoshop (圖像處理), Lightroom (照片調色), FL Studio (音樂製作)</p>
+                    </div>
+
+                    <div class="skills-category">
+                        <h4>網頁基礎與互動</h4>
+                        <p>HTML5, CSS3/SCSS, JavaScript (ES6+), RWD 響應式設計</p>
+                    </div>
+
+                </article>
+
+                <article id="section6" class="p-4 p-md-5 mb-4 bg-white rounded-3 shadow-sm portfolio-detail">
+                    <h2 class="section-title">圖片生成</h2>
+                    <div class="work-item pt-3 pb-0">
+                        <h4 class="text-dark">我的島嶼想像(9/15)</h4>
+                        <a href="assets\資二甲_111316015_王怡婷_我的島嶼想像.pptx" download="我的島嶼想像_9-15.pdf"
+                            class="btn btn-primary btn-custom-color mt-2">瀏覽完整作業</a>
+
+                        <div class="row g-4 mt-3">
+                            <div class="col-12 col-md-6"> 
+                                <figure class="figure shadow-sm">
+                                    <img src="assets/images/島嶼1.png"
+                                        class="figure-img img-fluid rounded custom-img-height" alt="夕陽下的國小">
+                                    <figcaption class="figure-caption text-center text-secondary">夢幻島</figcaption>
+                                </figure>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <figure class="figure shadow-sm">
+                                    <img src="assets/images/島嶼2.png"
+                                        class="figure-img img-fluid rounded custom-img-height" alt="一個人坐著EMO">
+                                    <figcaption class="figure-caption text-center text-secondary">寫實島</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="work-item pt-3 pb-0">
+                        <h4 class="text-dark">從 AI 商品到廣告文案(9/22)</h4>
+                        <a href="assets\資二甲_111316015_王怡婷_從 AI 商品到廣告文案.pptx" download="從AI商品到廣告文案_9-22.pdf"
+                            class="btn btn-primary btn-custom-color mt-2">瀏覽完整作業</a>
+
+                        <div class="row g-4 mt-3">
+                            <div class="col-12 col-md-6">
+                                <figure class="figure shadow-sm">
+                                    <img src="assets/images/陪伴機器人插圖.png"
+                                        class="figure-img img-fluid rounded custom-img-height" alt="陪伴機器人插圖">
+                                    <figcaption class="figure-caption text-center text-secondary">陪伴機器人</figcaption>
+                                </figure>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <figure class="figure shadow-sm">
+                                    <img src="assets/images/智能陪伴機器人.png"
+                                        class="figure-img img-fluid rounded custom-img-height" alt="智能陪伴機器人">
+                                    <figcaption class="figure-caption text-center text-secondary">智能陪伴機器人</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article id="section4" class="p-4 p-md-5 mb-4 bg-white rounded-3 shadow-sm portfolio-detail">
+                    <h2 class="section-title">音樂生成</h2>
+                    <div class="work-item pt-3 pb-0">
+                        <h4 class="text-dark">配樂(2025)</h4>
+                        <p class="text-secondary">簡介：AIVA製作的純音樂。</p>
+                        <a href="https://creators.aiva.ai/publicPlayer?c=68eca2840e534708d4864482" target="_blank"
+                            class="btn btn-primary btn-custom-color mt-2">試聽連結</a>
+                    </div>
+                    <div class="work-item pt-3 pb-3 border-bottom border-dashed">
+                        <h4 class="text-dark">光的遊戲 (Game of Light) (2025)</h4>
+                        <p class="text-secondary">類型：Suno AI製作的有歌詞歌曲。</p>
+                        <a href="https://suno.com/s/TsyjLOlQeGLPG9vY" target="_blank"
+                            class="btn btn-primary btn-custom-color mt-2">試聽連結</a>
+                    </div>
+
+                </article>
+
+
+                <article id="section5" class="p-4 p-md-5 mb-4 bg-white rounded-3 shadow-sm portfolio-detail">
+                    <h2 class="section-title">視訊作品</h2>
+
+                    <div class="work-item pt-3 pb-0">
+                        <h4 class="text-dark">多媒體概論的期中作業。</h4>
+                        <p class="text-secondary">手繪手書：如果有一天我變得很有錢 (2025)</p>
+                        <div class="ratio ratio-16x9 my-3">
+                            <iframe src="https://www.youtube.com/embed/oo9rgAN4BUw?si=Jih4pWtY7xzghnDm"
+                                title="YouTube video player" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </article>
+
+                <article id="section7" class="p-4 p-md-5 mb-4 bg-white rounded-3 shadow-sm contact-info">
+                    <h2 class="section-title">✉️ 聯繫我</h2>
+                    <p class="pt-3">Email: <a href="mailto:s111316015@stu.ntue.edu.tw"
+                            class="text-accent text-decoration-none fw-medium">s111316015@stu.ntue.edu.tw</a></p>
+                    <p>Instagram: <a href="https://www.instagram.com/yi_ting0318?igsh=MTl4YzJkZjJpYmVlbw=="
+                            target="_blank" class="text-accent text-decoration-none fw-medium">yi_ting0318</a></p>
+                </article>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-4 text-secondary border-top mt-5">
+        <p class="mb-1">&copy; 2025 王怡婷. 保留所有權利。</p>
+        <time datetime="2025-12-01" class="small">最後更新日期：2025年12月1日</time>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    </body>
+
+</html>
