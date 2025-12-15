@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Fairy Adventure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS for Pixel Art Aesthetic */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        body {
+            /* 讓 iframe 內的 body 佔滿整個視口，並居中遊戲 */
+            background-color: #f7f7f5; /* 讓 iframe 背景與主網站背景一致，更自然 */
+            font-family: 'Press Start 2P', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            padding: 1rem;
+        }
+        
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #34495e; /* Slightly lighter container */
+            border: 8px solid #ecf0f1;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 1rem;
+            max-width: 90vw; /* 響應式：限制最大寬度為視口寬度的 90% */
+            width: 480px; 
+            position: relative; /* Make container relative for absolute positioning of the credit */
+        }
+
+        #game-canvas {
+            border: 4px solid #f39c12; /* Accent border */
+            background-color: #7f8c8d; /* Game background (ground/dungeon floor) */
+            cursor: pointer;
+            image-rendering: pixelated; /* Ensure crisp pixel scaling */
+            touch-action: none; /* Prevent default touch actions like panning */
+        }
+        
+        .game-title {
+            color: #f1c40f;
+            text-shadow: 2px 2px #c0392b;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* New style for the creator credit */
+        #creator-credit {
+            position: absolute;
+            top: 0.5rem; /* Reduced from 1rem to 0.5rem to move it slightly up */
+            left: 1rem;
+            color: #bdc3c7; /* Light gray text */
+            font-size: 0.6rem; /* Small font size */
+            font-family: sans-serif; /* Use a more legible font for small text */
+            z-index: 20;
+        }
+
+        .score-board p {
+            font-size: 0.75rem;
+            color: #ecf0f1;
+        }
+
+        .pixel-button {
+            transition: all 0.05s ease;
+            box-shadow: 0 4px #8e44ad;
+            transform: translateY(0);
+            background-color: #9b59b6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .pixel-button:active {
+            box-shadow: 0 0 #8e44ad;
+            transform: translateY(4px);
+        }
+
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(44, 62, 80, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .overlay-content {
+            background: #ecf0f1;
+            border: 6px solid #e74c3c;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            animation: bounceIn 0.5s ease-out;
+        }
+
+        /* 響應式：在小螢幕上調整文字大小 */
+        @media (max-width: 640px) {
+            .game-title {
+                font-size: 1rem;
+            }
+            .score-board p {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="creator-credit">王怡婷製作</div> 
+
+        <h1 class="game-title">Fairy Adventure</h1> 
+        
+        <div class="score-board flex justify-between w-full max-w-sm px-2 mb-2">
+            <p>Score: <span id="current-score">0</span></p>
+            <p>Hi-Score: <span id="high-score">0</span></p>
+        </div>
+
+        <div class="relative w-full aspect-square max-w-xl">
+            <canvas id="game-canvas"></canvas>
+
+            <div id="overlay" class="absolute inset-0 flex items-center justify-center rounded-md">
+                <div id="overlay-content" class="overlay-content">
+                    <h2 id="overlay-title" class="text-xl text-red-600 mb-4">Start Game</h2>
+                    <p id="overlay-message" class="text-xs mb-6">Welcome to the Fairy World!<br>Use WASD or Arrow Keys to move.<br>Collect **Heart Gems** (♥) for points, avoid **Skull Enemies** (💀).</p>
+                    <button id="start-button" class="pixel-button">Start Adventure</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase/Canvas Global Variables ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db;
+        let auth;
+        let userId = null;
+        
+        // Game State Variables
+        let canvas, ctx;
+        let animationFrameId;
+        
+        let GRID_SIZE = 20; // Size of all game objects and grid cells
+        let TILE_COUNT = 25; // Number of tiles across the canvas
+        let GAME_SPEED = 1000 / 10; // 10 frames per second game logic update
+
+        // Enemy movement control (New variables for slower enemy movement)
+        let enemyMoveCounter = 0;
+        const ENEMY_MOVE_FREQUENCY = 5; // Enemies move every 5 game updates (2 times per second)
+
+        let lastUpdate = 0;
+
+        const GameState = {
+            START: 'START',
+            RUNNING: 'RUNNING',
+            OVER: 'OVER'
+        };
+
+        let currentGameState = GameState.START;
+        let score = 0;
+        let highScore = 0;
+
+        // Game Objects
+        // Player is referred to as "Sprite"
+        let player = { x: 0, y: 0, color: '#3498db', size: GRID_SIZE, velocity: { x: 0, y: 0 }, nextVelocity: { x: 1, y: 0 } }; 
+        let collectibles = [];
+        let obstacles = [];
+
+        // Input
+        let keyMap = {};
+
+        // --- Utility Functions ---
+
+        /** Sets up the canvas and context. */
+        function setupCanvas() {
+            canvas = document.getElementById('game-canvas');
+            ctx = canvas.getContext('2d');
+            // 響應式關鍵：當視窗大小改變時，重新調整 Canvas
+            window.addEventListener('resize', resizeCanvas); 
+            resizeCanvas();
+
+            // Attach touch listeners here, where canvas is guaranteed to be defined
+            canvas.addEventListener('touchstart', handleTouchStart);
+            canvas.addEventListener('touchend', handleTouchEnd);
+        }
+
+        /** Handles canvas resizing to maintain square aspect ratio and pixel look. */
+        function resizeCanvas() {
+            const container = document.getElementById('game-container');
+            // Get the current container width, limiting the maximum size to 480px for a smaller game screen
+            const size = Math.min(container.clientWidth - 32, 480); 
+            
+            canvas.width = size;
+            canvas.height = size;
+            
+            // 響應式關鍵：根據新的 Canvas 尺寸和固定的網格數 (TILE_COUNT) 重新計算每個網格的大小
+            GRID_SIZE = Math.floor(size / TILE_COUNT);
+            
+            // 調整 Canvas 尺寸使其精確匹配網格大小，避免渲染失真
+            canvas.width = GRID_SIZE * TILE_COUNT;
+            canvas.height = GRID_SIZE * TILE_COUNT;
+
+            // 更新所有遊戲元素的大小
+            player.size = GRID_SIZE;
+            collectibles.forEach(c => c.size = GRID_SIZE);
+            obstacles.forEach(o => o.size = GRID_SIZE);
+            
+            draw(); // Redraw immediately after resize
+        }
+
+        /** Draws a single square object. */
+        function drawSquare(x, y, size, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x * GRID_SIZE, y * GRID_SIZE, size, size);
+            ctx.strokeStyle = '#2c3e50';
+            ctx.strokeRect(x * GRID_SIZE, y * GRID_SIZE, size, size);
+        }
+
+        /** Draws text on the canvas (used for item/obstacle identifiers) */
+        function drawText(x, y, text, color) {
+            ctx.fillStyle = color;
+            // For Emojis/Symbols, use a slightly larger font size for better visibility
+            // The font family is crucial for displaying Emojis correctly
+            ctx.font = `${Math.floor(GRID_SIZE * 0.9)}px sans-serif, 'Press Start 2P'`; 
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, x * GRID_SIZE + GRID_SIZE / 2, y * GRID_SIZE + GRID_SIZE / 2 + 2);
+        }
+
+        /** Clears the canvas. */
+        function clearCanvas() {
+            ctx.fillStyle = '#7f8c8d'; // Canvas background
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // --- Game Logic ---
+
+        /** Generates a random position that is not occupied by the player. */
+        function getRandomPosition(excludeX, excludeY) {
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * TILE_COUNT);
+                y = Math.floor(Math.random() * TILE_COUNT);
+            } while (x === excludeX && y === excludeY);
+            return { x, y };
+        }
+
+        /** Spawns a new collectible item (Heart Gem). */
+        function spawnCollectible() {
+            const pos = getRandomPosition(player.x, player.y);
+            // Color: Gold (#FFD700), Symbol: Heart (♥)
+            collectibles.push({ x: pos.x, y: pos.y, color: '#FFD700', symbol: '♥', size: GRID_SIZE }); 
+        }
+
+        /** Spawns a new obstacle item (Skull Enemy). */
+        function spawnObstacle() {
+            const pos = getRandomPosition(player.x, player.y);
+            // Color: Dark Red (#611E1E), Symbol: Skull (💀)
+            obstacles.push({ x: pos.x, y: pos.y, color: '#611E1E', symbol: '💀', size: GRID_SIZE });
+        }
+
+        /** Moves all enemies one step randomly. (New function) */
+        function moveEnemies() {
+            obstacles.forEach(obstacle => {
+                // Determine random direction: 0=no move, 1=up, 2=down, 3=left, 4=right
+                const direction = Math.floor(Math.random() * 5); 
+                
+                let newX = obstacle.x;
+                let newY = obstacle.y;
+
+                if (direction === 1) newY -= 1; // Up
+                else if (direction === 2) newY += 1; // Down
+                else if (direction === 3) newX -= 1; // Left
+                else if (direction === 4) newX += 1; // Right
+
+                // Keep enemy within bounds
+                obstacle.x = Math.max(0, Math.min(TILE_COUNT - 1, newX));
+                obstacle.y = Math.max(0, Math.min(TILE_COUNT - 1, newY));
+            });
+        }
+
+
+        /** Initializes the game state. */
+        function initializeGame() {
+            score = 0;
+            document.getElementById('current-score').textContent = score;
+            
+            // Reset player to center
+            player.x = Math.floor(TILE_COUNT / 2);
+            player.y = Math.floor(TILE_COUNT / 2);
+            player.velocity.x = 0;
+            player.velocity.y = 0;
+            player.nextVelocity.x = 0; 
+            player.nextVelocity.y = 0;
+
+            collectibles = [];
+            obstacles = [];
+            enemyMoveCounter = 0; // Reset enemy counter
+            
+            // Spawn initial items (Increased enemy count to 4)
+            spawnCollectible();
+            spawnObstacle();
+            spawnObstacle();
+            spawnObstacle(); 
+            spawnObstacle(); 
+
+            // Reset input map
+            keyMap = {};
+            
+            // Ensure overlay is hidden
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        /** The main game logic update loop. */
+        function update() {
+            if (currentGameState !== GameState.RUNNING) return;
+
+            // Apply next velocity to current velocity (smooth transition from input)
+            player.velocity.x = player.nextVelocity.x;
+            player.velocity.y = player.nextVelocity.y;
+
+            // Update player position
+            player.x += player.velocity.x;
+            player.y += player.velocity.y;
+
+            // Clamp player position to boundary
+            if (player.x < 0) player.x = 0;
+            if (player.x >= TILE_COUNT) player.x = TILE_COUNT - 1;
+            if (player.y < 0) player.y = 0;
+            if (player.y >= TILE_COUNT) player.y = TILE_COUNT - 1;
+
+            // --- Enemy Movement Logic --- (New Logic)
+            enemyMoveCounter++;
+            if (enemyMoveCounter >= ENEMY_MOVE_FREQUENCY) {
+                moveEnemies();
+                enemyMoveCounter = 0;
+            }
+            // --- End Enemy Movement Logic ---
+
+            // 1. Check for collectible collision
+            for (let i = collectibles.length - 1; i >= 0; i--) {
+                const item = collectibles[i];
+                if (player.x === item.x && player.y === item.y) {
+                    collectibles.splice(i, 1); // Remove item
+                    score += 10;
+                    document.getElementById('current-score').textContent = score;
+                    
+                    // Spawn new items
+                    spawnCollectible();
+                    if (score % 50 === 0) { // Spawn new obstacle every 50 points
+                        spawnObstacle();
+                    }
+                    break; // Only collect one item per update
+                }
+            }
+
+            // 2. Check for obstacle collision
+            for (let i = 0; i < obstacles.length; i++) {
+                const obstacle = obstacles[i];
+                if (player.x === obstacle.x && player.y === obstacle.y) {
+                    gameOver();
+                    return;
+                }
+            }
+        }
+
+        /** The main draw function. */
+        function draw() {
+            clearCanvas();
+            
+            // Draw Collectibles (Heart Gem)
+            collectibles.forEach(item => {
+                drawSquare(item.x, item.y, item.size, item.color);
+                drawText(item.x, item.y, item.symbol, '#c0392b'); // Dark red for heart symbol
+            });
+
+            // Draw Obstacles (Skull Enemy)
+            obstacles.forEach(obstacle => {
+                drawSquare(obstacle.x, obstacle.y, obstacle.size, obstacle.color);
+                drawText(obstacle.x, obstacle.y, obstacle.symbol, '#ecf0f1'); // White for skull symbol
+            });
+
+            // Draw Player (Fairy/Sprite)
+            drawSquare(player.x, player.y, player.size, player.color);
+            drawText(player.x, player.y, '✨', '#ecf0f1'); // Changed 'P' to Emoji '✨'
+
+            // Request next frame
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        /** Main game loop driven by requestAnimationFrame (for drawing) and an interval timer (for logic). */
+        function gameLoop(timestamp) {
+            if (currentGameState !== GameState.RUNNING) {
+                cancelAnimationFrame(animationFrameId);
+                return;
+            }
+
+            // Logic update is rate-limited by GAME_SPEED
+            if (timestamp - lastUpdate > GAME_SPEED) {
+                update();
+                lastUpdate = timestamp;
+            }
+
+            draw();
+        }
+
+        // --- Game Flow Control ---
+
+        function startGame() {
+            if (currentGameState === GameState.RUNNING) return;
+            currentGameState = GameState.RUNNING;
+            initializeGame();
+            lastUpdate = performance.now(); // Reset timer
+            gameLoop(lastUpdate); // Start the loop
+        }
+
+        async function gameOver() {
+            if (currentGameState !== GameState.RUNNING) return;
+            currentGameState = GameState.OVER;
+            cancelAnimationFrame(animationFrameId);
+            
+            // Check and update High Score
+            let newHighScore = false;
+            if (score > highScore) {
+                highScore = score;
+                document.getElementById('high-score').textContent = highScore;
+                await saveHighScore(highScore);
+                newHighScore = true;
+            }
+
+            // Show Game Over screen (English)
+            const title = newHighScore ? "NEW HI-SCORE!" : "GAME OVER";
+            const message = `Final Score: ${score}<br>Current High Score: ${highScore}<br>Click Restart to try again!`;
+            
+            showOverlay(title, message, 'Restart'); // Button text translated
+            
+            // Change button to restart
+            const startButton = document.getElementById('start-button');
+            startButton.onclick = () => {
+                hideOverlay();
+                startGame();
+            }
+        }
+
+        function showOverlay(title, message, buttonText) {
+            document.getElementById('overlay-title').textContent = title;
+            document.getElementById('overlay-message').innerHTML = message;
+            document.getElementById('start-button').textContent = buttonText;
+            document.getElementById('overlay').style.display = 'flex';
+        }
+
+        function hideOverlay() {
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        // --- Input Handling ---
+
+        function handleInput(event) {
+            if (currentGameState !== GameState.RUNNING) return;
+            
+            const key = event.key.toLowerCase();
+            let newX = player.velocity.x;
+            let newY = player.velocity.y;
+
+            if (key === 'arrowup' || key === 'w') { newX = 0; newY = -1; }
+            else if (key === 'arrowdown' || key === 's') { newX = 0; newY = 1; }
+            else if (key === 'arrowleft' || key === 'a') { newX = -1; newY = 0; }
+            else if (key === 'arrowright' || key === 'd') { newX = 1; newY = 0; }
+            
+            // Only allow change if movement is not zero (i.e., we are trying to move)
+            if (newX !== 0 || newY !== 0) {
+                player.nextVelocity.x = newX;
+                player.nextVelocity.y = newY;
+            }
+        }
+
+        document.addEventListener('keydown', handleInput);
+        
+        // Touch/Swipe Logic for Mobile variables
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        function handleTouchStart(e) {
+            e.preventDefault(); // Prevent scrolling/panning
+            if (currentGameState === GameState.RUNNING) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            } else {
+                // If game is not running, treat tap as a start/restart button press
+                document.getElementById('start-button').click();
+            }
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault(); // Prevent default behavior
+            if (currentGameState !== GameState.RUNNING) return;
+
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+
+            const threshold = 20;
+
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > threshold) {
+                // Horizontal swipe
+                player.nextVelocity.x = dx > 0 ? 1 : -1;
+                player.nextVelocity.y = 0;
+            } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > threshold) {
+                // Vertical swipe
+                player.nextVelocity.x = 0;
+                player.nextVelocity.y = dy > 0 ? 1 : -1;
+            }
+        }
+
+
+        // --- Firestore Integration (High Score Persistence) ---
+        
+        /**
+         * Fetches the user's high score from Firestore.
+         */
+        async function getHighScore() {
+            if (!db || !userId) return;
+
+            const path = `artifacts/${appId}/users/${userId}/game_data/high_score`;
+            const highScoreRef = doc(db, path);
+            
+            try {
+                const docSnap = await getDoc(highScoreRef);
+                if (docSnap.exists()) {
+                    highScore = docSnap.data().score || 0;
+                } else {
+                    console.log("No high score document found, initializing to 0.");
+                    highScore = 0;
+                }
+            } catch (error) {
+                console.error("Error fetching high score:", error);
+                // Fallback to 0 if retrieval fails
+                highScore = 0; 
+            }
+            document.getElementById('high-score').textContent = highScore;
+        }
+
+        /**
+         * Saves a new high score to Firestore.
+         */
+        async function saveHighScore(newScore) {
+            if (!db || !userId) return;
+
+            const path = `artifacts/${appId}/users/${userId}/game_data/high_score`;
+            const highScoreRef = doc(db, path);
+            
+            try {
+                await setDoc(highScoreRef, { score: newScore, date: new Date().toISOString() });
+                console.log("High score saved successfully.");
+            } catch (error) {
+                console.error("Error saving high score:", error);
+            }
+        }
+
+
+        /**
+         * Initializes Firebase and authenticates the user.
+         */
+        async function initializeFirebase() {
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing.");
+                // Removed UI display error message
+                return;
+            }
+
+            try {
+                // setLogLevel('Debug'); // Uncomment for debugging
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Authentication
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                // Get user ID after sign-in
+                userId = auth.currentUser?.uid || 'anonymous';
+                
+                // Load high score once authenticated
+                await getHighScore();
+
+            } catch (error) {
+                console.error("Firebase initialization or sign-in failed:", error);
+                // Removed UI display error message
+            }
+        }
+
+
+        // --- Initial Load ---
+
+        window.onload = function() {
+            setupCanvas();
+            initializeFirebase();
+            
+            // Set up the initial start button
+            const startButton = document.getElementById('start-button');
+            startButton.onclick = startGame;
+            
+            // Show the initial start screen (Updated with more detail)
+            showOverlay(
+                'Fairy Adventure', 
+                'Welcome to the Fairy World! Your goal is to collect as many **Heart Gems** (♥) as possible.<br><br>' +
+                '**Movement:** Use WASD, Arrow Keys, or swipe on the screen.<br>' +
+                '**Collect:** Each Heart Gem (♥) gives you 10 points.<br>' +
+                '**Avoid:** Skull Enemies (💀) move slowly and randomly. Collision means Game Over!<br>' +
+                'Your highest score is automatically saved.', 
+                'Start Adventure'
+            );
+        };
+
+    </script>
+</body>
+</html>s

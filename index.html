@@ -48,7 +48,9 @@
             font-weight: 300;
         }
 
-        h1, h2, h3 {
+        h1,
+        h2,
+        h3 {
             color: var(--accent-color);
             margin-top: 0;
             border-left: 4px solid var(--morandi-primary);
@@ -58,9 +60,17 @@
             margin-bottom: 20px;
         }
 
-        h1 { font-size: 2.2rem; }
-        h2 { font-size: 1.8rem; }
-        h3 { font-size: 1.4rem; }
+        h1 {
+            font-size: 2.2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+        }
 
         h4 {
             font-weight: 500;
@@ -73,6 +83,7 @@
             margin-top: 20px;
             margin-bottom: 30px;
         }
+
         /* ---------------------------------------------------- */
 
         /* -------------------- 間距與佈局調整 -------------------- */
@@ -82,7 +93,8 @@
             padding: 15px 20px;
         }
 
-        .nav-list-custom { /* 使用 HTML 中的自定義 class */
+        .nav-list-custom {
+            /* 使用 HTML 中的自定義 class */
             gap: 30px;
         }
 
@@ -96,18 +108,19 @@
         .nav-list-custom a:hover {
             color: var(--accent-color);
         }
-        
+
         /* 修正導覽列項目在摺疊後的樣式 */
         @media (max-width: 991.98px) {
             .nav-list-custom {
                 /* 小螢幕上清除 gap，讓項目垂直堆疊 */
-                gap: 0; 
+                gap: 0;
                 padding-top: 10px;
             }
+
             .nav-list-custom .nav-item {
                 /* 確保點擊區域寬度足夠 */
                 width: 100%;
-                padding: 5px 0; 
+                padding: 5px 0;
             }
         }
 
@@ -149,13 +162,15 @@
         }
 
         /* 作品/經歷區塊樣式 */
-        .work-item, .experience-item {
+        .work-item,
+        .experience-item {
             border-bottom: 1px dashed var(--border-color);
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
 
-        .work-item:last-child, .experience-item:last-child {
+        .work-item:last-child,
+        .experience-item:last-child {
             border-bottom: none;
         }
 
@@ -227,9 +242,11 @@
                 padding: 30px;
                 margin-bottom: 30px;
             }
+
             main {
                 margin: 30px auto;
             }
+
             .profile-info {
                 text-align: center;
             }
@@ -242,7 +259,64 @@
             font-weight: 700 !important;
             font-size: 1.5rem !important;
         }
+
         /* -------------------------------------------------------- */
+
+        /* 確保 iframe 在父容器中可以完全顯示，並設置最小高度 */
+        .game-iframe {
+            border: none;
+            width: 100%;
+            min-height: 500px;
+            /* 設置一個合理的最小高度 */
+            display: block;
+            margin-top: 20px;
+        }
+
+        /* -------------------- 導航列字體顏色調整 -------------------- */
+
+        .navbar-brand {
+            color: var(--accent-color) !important;
+            font-weight: 700 !important;
+            font-size: 1.5rem !important;
+        }
+
+        /* -------------------------------------------------------- */
+
+        /*
+    【遊戲 iframe 調整】
+    確保 iframe 能夠完整顯示遊戲 (寬度 480px) 並在內容區居中。
+    */
+        .game-iframe-wrapper {
+            /* 新增一個容器 div 以便於 iframe 居中 */
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .game-iframe {
+            /* 讓 iframe 具有固定寬度，以匹配遊戲設計，同時設置合理高度 */
+            width: 480px;
+            height: 620px;
+            /* 增加高度以容納遊戲標題、記分板、Canvas 和下方按鈕 */
+            border: 4px solid var(--border-color);
+            /* 增加邊框以區隔遊戲和網站內容 */
+            border-radius: 8px;
+            display: block;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 響應式調整：在小螢幕上，iframe 應縮小以適應畫面 */
+        @media (max-width: 520px) {
+            .game-iframe {
+                width: 100%;
+                /* 在小螢幕上佔滿寬度 */
+                height: 550px;
+                /* 略微縮小高度 */
+                max-width: 90vw;
+            }
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
         rel="stylesheet">
@@ -268,10 +342,11 @@
                         <li class="nav-item"><a class="nav-link" href="#section6">圖片</a></li>
                         <li class="nav-item"><a class="nav-link" href="#section4">音樂</a></li>
                         <li class="nav-item"><a class="nav-link" href="#section5">視訊</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#section8">期末</a></li>
                         <li class="nav-item"><a class="nav-link" href="#section7">聯繫</a></li>
                     </ul>
                 </div>
-                
+
             </div>
         </nav>
     </header>
@@ -291,17 +366,17 @@
                             <h3>王怡婷</h3>
                             <p class="text-secondary degree">
                                 <em><strong><a href="https://www.ntue.edu.tw/" target="_blank"
-                                                class="text-decoration-none text-accent"> 國立臺北教育大學</a></strong>
+                                            class="text-decoration-none text-accent"> 國立臺北教育大學</a></strong>
                                     資訊科學系</em>
                             </p>
                             <p class="text-secondary degree">
                                 <em><strong><a href="https://www.bdsh.ntpc.edu.tw/" target="_blank"
-                                                class="text-decoration-none text-accent"> 新北市立北大高級中學</a></strong>
+                                            class="text-decoration-none text-accent"> 新北市立北大高級中學</a></strong>
                                     數理實驗班</em>
                             </p>
                             <p class="text-secondary degree">
                                 <em><strong><a href="https://www.dfsh.ntpc.edu.tw/" target="_blank"
-                                                class="text-decoration-none text-accent"> 新北市立丹鳳高級中學</a></strong>
+                                            class="text-decoration-none text-accent"> 新北市立丹鳳高級中學</a></strong>
                                     國中部</em>
                             </p>
                         </div>
@@ -433,6 +508,30 @@
                     </div>
                 </article>
 
+                <article id="section8" class="p-4 p-md-5 mb-4 bg-white rounded-3 shadow-sm portfolio-detail">
+                    <h2 class="section-title">期末作業</h2>
+                    <div class="work-item pt-3 pb-0">
+                        <h4 class="text-dark">Part A</h4>
+                        <p class="text-secondary">AI生成影片_小毛球。</p>
+                        <div class="ratio ratio-16x9 my-3">
+                            <iframe src="https://www.youtube.com/embed/HUQjdIuRx9k?si=JwuC6V0qNwzk3tYn"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <div class="work-item pt-3 pb-3 border-bottom border-dashed">
+                        <h4 class="text-dark">Part B</h4>
+                        <p class="text-secondary">操控小精靈在方格世界中收集愛心寶石，同時閃避隨機移動的骷髏敵人，挑戰最高分！</p>
+
+                        <div class="game-iframe-wrapper">
+                            <iframe src="game.html" class="game-iframe" title="Fairy Adventure Game"
+                                allow="fullscreen"></iframe>
+                        </div>
+
+                    </div>
+                </article>
+
                 <article id="section7" class="p-4 p-md-5 mb-4 bg-white rounded-3 shadow-sm contact-info">
                     <h2 class="section-title">✉️ 聯繫我</h2>
                     <p class="pt-3">Email: <a href="mailto:s111316015@stu.ntue.edu.tw"
@@ -440,6 +539,8 @@
                     <p>Instagram: <a href="https://www.instagram.com/yi_ting0318?igsh=MTl4YzJkZjJpYmVlbw=="
                             target="_blank" class="text-accent text-decoration-none fw-medium">yi_ting0318</a></p>
                 </article>
+
+
 
             </div>
         </div>
